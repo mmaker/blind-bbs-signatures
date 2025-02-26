@@ -567,20 +567,14 @@ Deserialization:
 
 Procedure:
 
-1. (secret_prover_blind, s~, m~_1, ..., m~_M)
-                                         = BBS.get_random_scalars(M + 2)
-2. C = Q_2 * secret_prover_blind + J_1 * msg_1 + ... + J_M * msg_M
-3. Cbar = Q_2 * s~ + J_1 * m~_1 + ... + J_M * m~_M
-
-4. challenge = calculate_blind_challenge(C, Cbar, blind_generators,
-                                                                 api_id)
-
-5. s^ = s~ + secret_prover_blind * challenge
-6. for m in (1, 2, ..., M): m^_i = m~_1 + msg_i * challenge
-
-7. proof = (s^, (m^_1, ..., m^_M), challenge)
-8. commit_with_proof = commitment_with_proof_to_octets(C, proof)
-9. return (commit_with_proof, secret_prover_blind)
+1. secret_prover_blind = BBS.get_random_scalars(1)
+2. C =  J_1 * msg_1 + ... + J_M * msg_M + Q_2 * secret_prover_blind
+3. statement = statement(api_id)
+4. statement_msgs = statement.AppendScalars(committed_messages || secret_prover_blind)
+5. statement_gens = statement.AppendElement(blind_generators)
+6. statement.ConstrainMSM(C, statement_msgs_ statement)
+7. commit_with_proof = commitment_with_proof_to_octets(C, proof)
+8. return (commit_with_proof, secret_prover_blind)
 ```
 
 ### Core Commitment Verification
